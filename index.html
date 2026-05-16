@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calm Palette — Color System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a1a;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 40px 20px 80px;
+            color: white;
+        }
+
+        .page-header {
+            max-width: 1100px;
+            margin: 0 auto 50px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 300;
+            color: #999;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #555;
+            font-size: 13px;
+        }
+
+        .section-label {
+            max-width: 1100px;
+            margin: 50px auto 16px;
+            color: #444;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* ===== MAIN PALETTE GRID ===== */
+        .main-palette {
+            max-width: 1100px;
+            margin: 0 auto 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .main-palette .primary-large {
+            grid-column: 1;
+            grid-row: 1 / 3;
+            background: #9CAF88;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 280px;
+        }
+
+        .main-palette .color-block {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 140px;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .main-palette .color-block:hover {
+            filter: brightness(1.05);
+        }
+
+        .main-palette .color-block .hex {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .main-palette .color-block .name {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        /* ===== GRADASI ROW ===== */
+        .shade-row {
+            max-width: 1100px;
+            margin: 0 auto 8px;
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .shade-strip {
+            flex: 1 1 0%;
+            min-width: 0;
+            height: 80px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: flex 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+                        filter 0.2s;
+            position: relative;
+        }
+
+        .shade-strip:hover {
+            flex: 2.5 1 0%;
+            filter: brightness(1.1);
+            z-index: 2;
+        }
+
+        .shade-strip .hex-code {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .shade-strip:hover .hex-code {
+            opacity: 0.7;
+            transform: translateY(0);
+        }
+
+        /* ===== USAGE SECTION ===== */
+        .usage-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .usage-card {
+            background: #222;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .usage-preview {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .usage-info {
+            padding: 20px;
+        }
+
+        .usage-info h4 {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 6px;
+        }
+
+        .usage-info p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .usage-info .color-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .usage-info .color-dots span {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #444;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #9CAF88;
+            color: #1a1a1a;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            max-width: 1100px;
+            margin: 50px auto;
+            border: none;
+            border-top: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1>03. Color Palette</h1>
+        <p>Expanded calm color system — berdasarkan palette original lo</p>
+    </div>
+
+    <!-- ===== MAIN PALETTE ===== -->
+    <div class="section-label">Core Colors</div>
+    <div class="main-palette">
+        <div class="primary-large">
+            <span class="name">Primary</span>
+            <span class="hex" style="color:rgba(0,0,0,0.4);">#9CAF88</span>
+        </div>
+        <div class="color-block" style="background:#DC823B; color:white;">
+            <span class="name">Secondary</span>
+            <span class="hex">#DC823B</span>
+        </div>
+        <div class="color-block" style="background:#A2481A; color:white;">
+            <span class="name">Accent Dark</span>
+            <span class="hex">#A2481A</span>
+        </div>
+        <div class="color-block" style="background:#FFFFFF; color:#1a1a1a;">
+            <span class="name">Surface</span>
+            <span class="hex">#FFFFFF</span>
+        </div>
+        <div class="color-block" style="background:#F5F5DC; color:#1a1a1a;">
+            <span class="name">Background Light</span>
+            <span class="hex">#F5F5DC</span>
+        </div>
+        <div class="color-block" style="background:#DDE5D3; color:#1a1a1a;">
+            <span class="name">Muted Green</span>
+            <span class="hex">#DDE5D3</span>
+        </div>
+        <div class="color-block" style="background:#1a1a1a; color:white;">
+            <span class="name">Dark Surface</span>
+            <span class="hex">#1a1a1a</span>
+        </div>
+    </div>
+
+    <!-- ===== GRADASI: SAGE GREEN (PRIMARY) ===== -->
+    <div class="section-label">Sage Green — Primary Shades</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#F0F4EC" data-color="#F0F4EC"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F0F4EC</span></div>
+        <div class="shade-strip" style="background:#E4EBDD" data-color="#E4EBDD"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#E4EBDD</span></div>
+        <div class="shade-strip" style="background:#D6E0CD" data-color="#D6E0CD"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#D6E0CD</span></div>
+        <div class="shade-strip" style="background:#C7D4BD" data-color="#C7D4BD"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#C7D4BD</span></div>
+        <div class="shade-strip" style="background:#B8C8AD" data-color="#B8C8AD"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#B8C8AD</span></div>
+        <div class="shade-strip" style="background:#9CAF88" data-color="#9CAF88"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#9CAF88</span></div>
+        <div class="shade-strip" style="background:#859C6E" data-color="#859C6E"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#859C6E</span></div>
+        <div class="shade-strip" style="background:#6F8856" data-color="#6F8856"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#6F8856</span></div>
+        <div class="shade-strip" style="background:#597341" data-color="#597341"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#597341</span></div>
+        <div class="shade-strip" style="background:#455E30" data-color="#455E30"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#455E30</span></div>
+        <div class="shade-strip" style="background:#344924" data-color="#344924"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#344924</span></div>
+        <div class="shade-strip" style="background:#26381A" data-color="#26381A"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#26381A</span></div>
+        <div class="shade-strip" style="background:#1B2A12" data-color="#1B2A12"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#1B2A12</span></div>
+        <div class="shade-strip" style="background:#121D0C" data-color="#121D0C"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#121D0C</span></div>
+        <div class="shade-strip" style="background:#0A1208" data-color="#0A1208"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#0A1208</span></div>
+    </div>
+
+    <!-- ===== GRADASI: WARM ORANGE ===== -->
+    <div class="section-label">Warm Orange — Secondary Shades</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#FDF5EE" data-color="#FDF5EE"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FDF5EE</span></div>
+        <div class="shade-strip" style="background:#FCE8D6" data-color="#FCE8D6"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FCE8D6</span></div>
+        <div class="shade-strip" style="background:#F9D8B8" data-color="#F9D8B8"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F9D8B8</span></div>
+        <div class="shade-strip" style="background:#F5C89A" data-color="#F5C89A"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F5C89A</span></div>
+        <div class="shade-strip" style="background:#E8B06E" data-color="#E8B06E"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#E8B06E</span></div>
+        <div class="shade-strip" style="background:#DC823B" data-color="#DC823B"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#DC823B</span></div>
+        <div class="shade-strip" style="background:#C46E28" data-color="#C46E28"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#C46E28</span></div>
+        <div class="shade-strip" style="background:#AD5B1C" data-color="#AD5B1C"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#AD5B1C</span></div>
+        <div class="shade-strip" style="background:#954A14" data-color="#954A14"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#954A14</span></div>
+        <div class="shade-strip" style="background:#7D3B0E" data-color="#7D3B0E"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#7D3B0E</span></div>
+        <div class="shade-strip" style="background:#682E09" data-color="#682E09"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#682E09</span></div>
+        <div class="shade-strip" style="background:#532306" data-color="#532306"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#532306</span></div>
+        <div class="shade-strip" style="background:#3F1A04" data-color="#3F1A04"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#3F1A04</span></div>
+        <div class="shade-strip" style="background:#2B1202" data-color="#2B1202"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#2B1202</span></div>
+        <div class="shade-strip" style="background:#190A01" data-color="#190A01"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#190A01</span></div>
+    </div>
+
+    <!-- ===== GRADASI: TERRACOTTA ===== -->
+    <div class="section-label">Terracotta — Accent Shades</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#F9F0EC" data-color="#F9F0EC"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F9F0EC</span></div>
+        <div class="shade-strip" style="background:#F2DDD0" data-color="#F2DDD0"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F2DDD0</span></div>
+        <div class="shade-strip" style="background:#E9C5AD" data-color="#E9C5AD"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#E9C5AD</span></div>
+        <div class="shade-strip" style="background:#DFAD8A" data-color="#DFAD8A"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#DFAD8A</span></div>
+        <div class="shade-strip" style="background:#D08B60" data-color="#D08B60"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#D08B60</span></div>
+        <div class="shade-strip" style="background:#B86B3B" data-color="#B86B3B"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#B86B3B</span></div>
+        <div class="shade-strip" style="background:#A2481A" data-color="#A2481A"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#A2481A</span></div>
+        <div class="shade-strip" style="background:#8C3A12" data-color="#8C3A12"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#8C3A12</span></div>
+        <div class="shade-strip" style="background:#762E0C" data-color="#762E0C"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#762E0C</span></div>
+        <div class="shade-strip" style="background:#5F2408" data-color="#5F2408"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#5F2408</span></div>
+        <div class="shade-strip" style="background:#4A1B05" data-color="#4A1B05"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#4A1B05</span></div>
+        <div class="shade-strip" style="background:#361403" data-color="#361403"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#361403</span></div>
+        <div class="shade-strip" style="background:#240D02" data-color="#240D02"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#240D02</span></div>
+        <div class="shade-strip" style="background:#140801" data-color="#140801"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#140801</span></div>
+        <div class="shade-strip" style="background:#0A0400" data-color="#0A0400"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#0A0400</span></div>
+    </div>
+
+    <!-- ===== GRADASI: BEIGE / CREAM ===== -->
+    <div class="section-label">Beige — Background Shades</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#FEFDF8" data-color="#FEFDF8"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FEFDF8</span></div>
+        <div class="shade-strip" style="background:#FAF9F0" data-color="#FAF9F0"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FAF9F0</span></div>
+        <div class="shade-strip" style="background:#F5F5DC" data-color="#F5F5DC"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F5F5DC</span></div>
+        <div class="shade-strip" style="background:#EDEBD5" data-color="#EDEBD5"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#EDEBD5</span></div>
+        <div class="shade-strip" style="background:#E4E1CC" data-color="#E4E1CC"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#E4E1CC</span></div>
+        <div class="shade-strip" style="background:#D9D6BE" data-color="#D9D6BE"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#D9D6BE</span></div>
+        <div class="shade-strip" style="background:#C8C5A8" data-color="#C8C5A8"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#C8C5A8</span></div>
+        <div class="shade-strip" style="background:#B5B291" data-color="#B5B291"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#B5B291</span></div>
+        <div class="shade-strip" style="background:#A29E7B" data-color="#A29E7B"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#A29E7B</span></div>
+        <div class="shade-strip" style="background:#8E8A65" data-color="#8E8A65"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#8E8A65</span></div>
+        <div class="shade-strip" style="background:#7B7752" data-color="#7B7752"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#7B7752</span></div>
+        <div class="shade-strip" style="background:#686441" data-color="#686441"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#686441</span></div>
+        <div class="shade-strip" style="background:#555131" data-color="#555131"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#555131</span></div>
+        <div class="shade-strip" style="background:#423F23" data-color="#423F23"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#423F23</span></div>
+        <div class="shade-strip" style="background:#302D18" data-color="#302D18"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#302D18</span></div>
+    </div>
+
+    <!-- ✨ BRAND COLOURS (from SVG Logo) ✨ -->
+    
+    <!-- ===== GRADASI: METALLIC SILVER (Fork) ===== -->
+    <div class="section-label">✨ Brand Colours — Metallic Silver (Fork)</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#FEFEFE" data-color="#FEFEFE"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FEFEFE</span></div>
+        <div class="shade-strip" style="background:#F9FAFB" data-color="#F9FAFB"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F9FAFB</span></div>
+        <div class="shade-strip" style="background:#F3F4F6" data-color="#F3F4F6"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F3F4F6</span></div>
+        <div class="shade-strip" style="background:#EBECF0" data-color="#EBECF0"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#EBECF0</span></div>
+        <div class="shade-strip" style="background:#E5E7EB" data-color="#E5E7EB"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#E5E7EB</span></div>
+        <div class="shade-strip" style="background:#D1D5DB" data-color="#D1D5DB"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#D1D5DB</span></div>
+        <div class="shade-strip" style="background:#B0B5BF" data-color="#B0B5BF"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#B0B5BF</span></div>
+        <div class="shade-strip" style="background:#9CA3AF" data-color="#9CA3AF"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#9CA3AF</span></div>
+        <div class="shade-strip" style="background:#7E8591" data-color="#7E8591"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#7E8591</span></div>
+        <div class="shade-strip" style="background:#646B77" data-color="#646B77"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#646B77</span></div>
+        <div class="shade-strip" style="background:#4F5560" data-color="#4F5560"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#4F5560</span></div>
+        <div class="shade-strip" style="background:#3D424B" data-color="#3D424B"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#3D424B</span></div>
+        <div class="shade-strip" style="background:#2E3239" data-color="#2E3239"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#2E3239</span></div>
+        <div class="shade-strip" style="background:#1F2227" data-color="#1F2227"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#1F2227</span></div>
+        <div class="shade-strip" style="background:#121417" data-color="#121417"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#121417</span></div>
+    </div>
+
+    <!-- ===== GRADASI: VIBRANT ORANGE (Spoon/Bowl) ===== -->
+    <div class="section-label">✨ Brand Colours — Vibrant Orange (Spoon/Bowl)</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#FEF9F7" data-color="#FEF9F7"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FEF9F7</span></div>
+        <div class="shade-strip" style="background:#FDF4EF" data-color="#FDF4EF"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FDF4EF</span></div>
+        <div class="shade-strip" style="background:#FBEBE0" data-color="#FBEBE0"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FBEBE0</span></div>
+        <div class="shade-strip" style="background:#F9D9C4" data-color="#F9D9C4"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F9D9C4</span></div>
+        <div class="shade-strip" style="background:#F6C3A1" data-color="#F6C3A1"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F6C3A1</span></div>
+        <div class="shade-strip" style="background:#F2A673" data-color="#F2A673"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F2A673</span></div>
+        <div class="shade-strip" style="background:#ED8442" data-color="#ED8442"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#ED8442</span></div>
+        <div class="shade-strip" style="background:#F97316" data-color="#F97316"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#F97316</span></div>
+        <div class="shade-strip" style="background:#EA580C" data-color="#EA580C"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#EA580C</span></div>
+        <div class="shade-strip" style="background:#C7460A" data-color="#C7460A"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#C7460A</span></div>
+        <div class="shade-strip" style="background:#A53808" data-color="#A53808"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#A53808</span></div>
+        <div class="shade-strip" style="background:#822C06" data-color="#822C06"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#822C06</span></div>
+        <div class="shade-strip" style="background:#5F2104" data-color="#5F2104"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#5F2104</span></div>
+        <div class="shade-strip" style="background:#3C1603" data-color="#3C1603"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#3C1603</span></div>
+        <div class="shade-strip" style="background:#190802" data-color="#190802"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#190802</span></div>
+    </div>
+
+    <!-- ===== GRADASI: FRESH GREEN (Leaves/Food) ===== -->
+    <div class="section-label">✨ Brand Colours — Fresh Green (Leaves/Food)</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#F7FDF5" data-color="#F7FDF5"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F7FDF5</span></div>
+        <div class="shade-strip" style="background:#F0FDF4" data-color="#F0FDF4"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F0FDF4</span></div>
+        <div class="shade-strip" style="background:#E4FBE5" data-color="#E4FBE5"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#E4FBE5</span></div>
+        <div class="shade-strip" style="background:#D1F7CF" data-color="#D1F7CF"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#D1F7CF</span></div>
+        <div class="shade-strip" style="background:#B9F0B4" data-color="#B9F0B4"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#B9F0B4</span></div>
+        <div class="shade-strip" style="background:#9CE694" data-color="#9CE694"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#9CE694</span></div>
+        <div class="shade-strip" style="background:#7BD970" data-color="#7BD970"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#7BD970</span></div>
+        <div class="shade-strip" style="background:#84CC16" data-color="#84CC16"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#84CC16</span></div>
+        <div class="shade-strip" style="background:#65A30D" data-color="#65A30D"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#65A30D</span></div>
+        <div class="shade-strip" style="background:#54890B" data-color="#54890B"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#54890B</span></div>
+        <div class="shade-strip" style="background:#456F09" data-color="#456F09"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#456F09</span></div>
+        <div class="shade-strip" style="background:#375707" data-color="#375707"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#375707</span></div>
+        <div class="shade-strip" style="background:#2A4105" data-color="#2A4105"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#2A4105</span></div>
+        <div class="shade-strip" style="background:#1C2B03" data-color="#1C2B03"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#1C2B03</span></div>
+        <div class="shade-strip" style="background:#0A1A04" data-color="#0A1A04"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#0A1A04</span></div>
+    </div>
+
+    <!-- ===== GRADASI: SUNNY YELLOW (Bowl Highlight) ===== -->
+    <div class="section-label">✨ Brand Colours — Sunny Yellow (Bowl Highlight)</div>
+    <div class="shade-row">
+        <div class="shade-strip" style="background:#FEFDF8" data-color="#FEFDF8"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FEFDF8</span></div>
+        <div class="shade-strip" style="background:#FDFBEF" data-color="#FDFBEF"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FDFBEF</span></div>
+        <div class="shade-strip" style="background:#FBF6D9" data-color="#FBF6D9"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FBF6D9</span></div>
+        <div class="shade-strip" style="background:#F8EDB8" data-color="#F8EDB8"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F8EDB8</span></div>
+        <div class="shade-strip" style="background:#F4E091" data-color="#F4E091"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F4E091</span></div>
+        <div class="shade-strip" style="background:#F0CF64" data-color="#F0CF64"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#F0CF64</span></div>
+        <div class="shade-strip" style="background:#EBC23F" data-color="#EBC23F"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#EBC23F</span></div>
+        <div class="shade-strip" style="background:#FBBF24" data-color="#FBBF24"><span class="hex-code" style="color:rgba(0,0,0,0.5);">#FBBF24</span></div>
+        <div class="shade-strip" style="background:#F59E0B" data-color="#F59E0B"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#F59E0B</span></div>
+        <div class="shade-strip" style="background:#D97706" data-color="#D97706"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#D97706</span></div>
+        <div class="shade-strip" style="background:#B45309" data-color="#B45309"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#B45309</span></div>
+        <div class="shade-strip" style="background:#92400E" data-color="#92400E"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#92400E</span></div>
+        <div class="shade-strip" style="background:#713212" data-color="#713212"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#713212</span></div>
+        <div class="shade-strip" style="background:#4F240D" data-color="#4F240D"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#4F240D</span></div>
+        <div class="shade-strip" style="background:#1A1202" data-color="#1A1202"><span class="hex-code" style="color:rgba(255,255,255,0.7);">#1A1202</span></div>
+    </div>
+
+    <!-- ===== USAGE EXAMPLES ===== -->
+    <hr class="divider">
+    <div class="section-label">Usage Examples</div>
+    <div class="usage-grid">
+
+        <div class="usage-card">
+            <div class="usage-preview" style="background:#F5F5DC;">
+                <div style="width:100%;background:#9CAF88;padding:14px 20px;border-radius:8px;text-align:center;color:white;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">Primary Button</div>
+            </div>
+            <div class="usage-info">
+                <h4>Button & CTA</h4>
+                <p>Sage green untuk primary action, warm orange untuk secondary/cta penting.</p>
+                <div class="color-dots">
+                    <span style="background:#9CAF88;"></span>
+                    <span style="background:#DC823B;"></span>
+                    <span style="background:#F5F5DC;border:2px solid #ccc;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="usage-card">
+            <div class="usage-preview" style="background:#1a1a1a;">
+                <div style="width:100%;background:#222;padding:14px 20px;border-radius:8px;text-align:center;color:#9CAF88;font-weight:600;font-size:14px;border:1px solid #333;">Dark Mode Card</div>
+            </div>
+            <div class="usage-info">
+                <h4>Dark Mode</h4>
+                <p>Background gelap dengan aksen sage green yang soft di dark mode.</p>
+                <div class="color-dots">
+                    <span style="background:#1a1a1a;"></span>
+                    <span style="background:#222;"></span>
+                    <span style="background:#9CAF88;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="usage-card">
+            <div class="usage-preview" style="background:#F5F5DC;">
+                <div style="width:100%;display:flex;gap:8px;align-items:center;">
+                    <div style="flex:1;background:#DDE5D3;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#455E30;font-weight:600;">Success</div>
+                    <div style="flex:1;background:#DC823B;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:white;font-weight:600;">Warning</div>
+                    <div style="flex:1;background:#A2481A;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:white;font-weight:600;">Error</div>
+                </div>
+            </div>
+            <div class="usage-info">
+                <h4>Status Indicators</h4>
+                <p>Muted green untuk success, orange untuk warning, terracotta untuk error.</p>
+                <div class="color-dots">
+                    <span style="background:#DDE5D3;"></span>
+                    <span style="background:#DC823B;"></span>
+                    <span style="background:#A2481A;"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">✅ Copied!</div>
+
+    <script>
+        const toast = document.getElementById('toast');
+
+        document.querySelectorAll('.color-block, .shade-strip').forEach(el => {
+            el.addEventListener('click', () => {
+                const hex = el.getAttribute('data-color');
+                if (!hex) return;
+                navigator.clipboard.writeText(hex).then(() => {
+                    showToast(`✅ ${hex} copied!`);
+                }).catch(() => {
+                    showToast(`Hex: ${hex}`);
+                });
+            });
+        });
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1500);
+        }
+    </script>
+
+</body>
+</html>
